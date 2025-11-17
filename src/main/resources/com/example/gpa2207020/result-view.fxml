@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="620" prefWidth="950" styleClass="root" stylesheets="@gpa-style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gpa2207020.ResultController">
+
+    <top>
+        <VBox alignment="CENTER" spacing="5" styleClass="result-header">
+            <padding><Insets bottom="20" top="25" /></padding>
+            <Label styleClass="title-label" text="Student GPA Report" textFill="#e40f0f">
+            <font>
+               <Font name="Arial Black" size="51.0" />
+            </font></Label>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="25" styleClass="panel">
+            <padding><Insets bottom="25" left="25" right="25" top="25" /></padding>
+
+            <HBox alignment="CENTER" spacing="60" styleClass="result-box">
+                <VBox alignment="CENTER">
+                    <Label styleClass="section-title" text="Your GPA" />
+                    <Label fx:id="gpaLabel" styleClass="gpa-number" />
+                </VBox>
+
+                <VBox alignment="CENTER">
+                    <Label styleClass="section-title" text="Total Credits" />
+                    <Label fx:id="totalCreditsLabel" styleClass="gpa-number" />
+                </VBox>
+            </HBox>
+
+            <Separator />
+
+            <TableView fx:id="resultTable" prefHeight="400" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="nameCol" prefWidth="180" text="Course Name" />
+                    <TableColumn fx:id="codeCol" prefWidth="80" text="Code" />
+                    <TableColumn fx:id="creditsCol" prefWidth="85" text="Credit" />
+                    <TableColumn fx:id="teacher1Col" prefWidth="130" text="Teacher 1" />
+                    <TableColumn fx:id="teacher2Col" prefWidth="130" text="Teacher 2" />
+                    <TableColumn fx:id="gradeCol" prefWidth="80" text="Grade" />
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <padding><Insets bottom="20" right="20" top="12" /></padding>
+            <Button onAction="#handleBackToHome" styleClass="primary-button" text="Back to Home" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

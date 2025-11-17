@@ -5,14 +5,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 public class HelloApplication extends Application {
+
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 800, 500); // bigger window
-        stage.setTitle("Student Grading System - GPA Calculator");
+        Scene scene = new Scene(fxmlLoader.load(), 800, 500);
+        scene.getStylesheets().add(HelloApplication.class.getResource("gpa-style.css").toExternalForm());
+
+        stage.setTitle("GPA Calculator - Home");
         stage.setScene(scene);
         stage.show();
     }

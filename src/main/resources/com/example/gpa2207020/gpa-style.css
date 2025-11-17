@@ -1,0 +1,132 @@
+.root {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-background-color: #f5f7fb;
+}
+
+
+.header-bar {
+    -fx-background-color: #1f4f7b;
+    -fx-padding: 10 20;
+}
+
+.header-label {
+    -fx-text-fill: #e0ecff;
+    -fx-font-weight: bold;
+}
+
+.header-value {
+    -fx-text-fill: #ffeb3b;
+    -fx-font-weight: bold;
+}
+
+
+.panel {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0.2, 0, 3);
+}
+
+
+.section-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f4f7b;
+}
+
+.subtitle-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #444444;
+}
+
+
+.button {
+    -fx-cursor: hand;
+}
+
+.primary-button {
+    -fx-background-color: #1f7bb6;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-padding: 7 18;
+    -fx-font-weight: bold;
+}
+
+.primary-button:hover {
+    -fx-background-color: #155c85;
+}
+
+.secondary-button {
+    -fx-background-color: #d9e3f2;
+    -fx-text-fill: #222222;
+    -fx-background-radius: 5;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #c3d2eb;
+}
+
+.danger-button {
+    -fx-background-color: #d9534f;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+}
+
+.danger-button:hover {
+    -fx-background-color: #b63b38;
+}
+
+.link-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1f7bb6;
+    -fx-underline: true;
+}
+
+.link-button:hover {
+    -fx-text-fill: #0e4f72;
+}
+
+
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #1f4f7b;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #e8f1ff;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #b4d2ff;
+    -fx-text-fill: black;
+}
+
+
+.table-view .column-header-background {
+    -fx-background-color: #1f4f7b;
+}
+
+.table-view .column-header {
+    -fx-background-color: #1f4f7b;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-opacity: 1.0;
+}
+
+.table-view .filler {
+    -fx-background-color: #1f4f7b;
+}

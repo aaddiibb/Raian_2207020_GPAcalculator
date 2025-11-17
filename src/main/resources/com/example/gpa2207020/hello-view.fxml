@@ -1,63 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="500.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="com.example.gpa2207020.HelloController">
-
-    <left>
-        <VBox spacing="10.0" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets bottom="10" left="10" right="10" top="10" />
-            </padding>
-
-            <GridPane hgap="10" vgap="10">
-                <columnConstraints>
-                    <ColumnConstraints halignment="RIGHT" />
-                    <ColumnConstraints hgrow="ALWAYS" />
-                </columnConstraints>
-
-                <children>
-                    <Label text="Course Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                    <TextField fx:id="nameField" promptText="Course Name" text="English " GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-                    <Label text="Credits:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                    <TextField fx:id="creditsField" promptText="Credits (e.g. 3)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                    <Label text="Grade:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                    <ComboBox fx:id="gradeBox" promptText="Grade" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                </children>
-            <rowConstraints>
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-            </rowConstraints>
-            </GridPane>
-
-            <HBox alignment="CENTER_RIGHT" spacing="10">
-                <Button onAction="#handleAddCourse" text="Add Course" />
-                <Button onAction="#handleRemoveCourse" text="Remove Selected" />
-            </HBox>
-        </VBox>
-    </left>
+<BorderPane prefHeight="500" prefWidth="800"
+            stylesheets="@gpa-style.css"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.gpa2207020.HelloController">
 
     <center>
-        <TableView fx:id="table" BorderPane.alignment="CENTER">
-            <columns>
-                <TableColumn fx:id="nameCol" prefWidth="250" text="Course Name" />
-                <TableColumn fx:id="creditsCol" prefWidth="80" text="Credits" />
-                <TableColumn fx:id="gradeCol" prefWidth="80" text="Grade" />
-            </columns>
-        </TableView>
-    </center>
+        <VBox alignment="CENTER"
+              spacing="20"
+              styleClass="panel">
 
-    <bottom>
-        <Label fx:id="gpaLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Current GPA: 0.00" BorderPane.alignment="CENTER_LEFT">
             <padding>
-                <Insets bottom="10" left="10" right="10" top="10" />
+                <Insets top="30" bottom="30" left="30" right="30"/>
             </padding>
-        </Label>
-    </bottom>
+
+            <Label text="Student Grading System (GPA Calculator)"
+                   styleClass="section-title"
+                   alignment="CENTER"/>
+
+            <Label text="Add courses, record grades, and compute GPA interactively."
+                   maxWidth="520"
+                   wrapText="true"
+                   alignment="CENTER"
+                   styleClass="subtitle-label"/>
+
+
+            <Button text="Start GPA Calculator"
+                    onAction="#handleStartGpaCalculator"
+                    styleClass="primary-button"/>
+        </VBox>
+    </center>
 
 </BorderPane>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.gpa2207020.GpaFormController"
+            prefWidth="1000" prefHeight="600">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header-bar">
+            <padding>
+                <Insets top="10" bottom="10" left="15" right="15"/>
+            </padding>
+
+            <Label text="Target Credits:" styleClass="header-label"/>
+            <TextField fx:id="targetCreditsField" prefWidth="80" promptText="e.g. 15.0"/>
+
+            <Label text="Current Credits:" styleClass="header-label"/>
+            <Label fx:id="currentCreditsLabel" text="0.00" styleClass="header-value"/>
+        </HBox>
+    </top>
+
+
+    <left>
+        <VBox spacing="15" styleClass="panel">
+            <padding>
+                <Insets top="20" left="20" right="20" bottom="20"/>
+            </padding>
+
+            <Label text="Course Entry" styleClass="section-title"/>
+
+
+            <GridPane hgap="12" vgap="12">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <Label text="Course Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="courseNameField"
+                           promptText="e.g. Data Structures"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Course Code:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextField fx:id="courseCodeField"
+                           promptText="e.g. CSE2201"
+                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="Course Credit:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <TextField fx:id="courseCreditField"
+                           promptText="e.g. 3.0"
+                           GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label text="Teacher 1 Name:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <TextField fx:id="teacher1Field"
+                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                <Label text="Teacher 2 Name:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <TextField fx:id="teacher2Field"
+                           GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                <Label text="Grade:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                <ComboBox fx:id="gradeBox"
+                          promptText="Select grade"
+                          GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            </GridPane>
+
+            <Separator/>
+
+
+            <HBox spacing="12" alignment="CENTER_RIGHT">
+                <Button text="Add Course"
+                        onAction="#handleAddCourse"
+                        styleClass="primary-button"/>
+
+                <Button fx:id="updateButton"
+                        text="Update Selected"
+                        onAction="#handleUpdateCourse"
+                        styleClass="secondary-button"
+                        disable="true"/>
+
+                <Button text="Remove Selected"
+                        onAction="#handleRemoveCourse"
+                        styleClass="danger-button"/>
+            </HBox>
+
+            <Separator/>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="Reset"
+                        onAction="#handleReset"
+                        styleClass="secondary-button"/>
+
+                <Button text="Export to Text..."
+                        onAction="#handleExport"
+                        styleClass="secondary-button"/>
+            </HBox>
+
+            <Label fx:id="statusLabel" wrapText="true" styleClass="subtitle-label"/>
+
+            <Button text="Back to Home"
+                    onAction="#handleBackToHome"
+                    styleClass="link-button"/>
+        </VBox>
+    </left>
+
+
+    <center>
+        <VBox spacing="15">
+            <padding>
+                <Insets top="20" left="20" right="20"/>
+            </padding>
+
+            <Label text="Courses Entered" styleClass="section-title"/>
+
+            <TableView fx:id="courseTable" prefHeight="450">
+                <columns>
+                    <TableColumn fx:id="nameCol" text="Course Name" prefWidth="180"/>
+                    <TableColumn fx:id="codeCol" text="Code" prefWidth="80"/>
+                    <TableColumn fx:id="creditsCol" text="Credit" prefWidth="70"/>
+                    <TableColumn fx:id="teacher1Col" text="Teacher 1" prefWidth="130"/>
+                    <TableColumn fx:id="teacher2Col" text="Teacher 2" prefWidth="130"/>
+                    <TableColumn fx:id="gradeCol" text="Grade" prefWidth="70"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="15">
+            <padding>
+                <Insets top="10" bottom="15" right="20"/>
+            </padding>
+
+            <Label text="Press Calculate GPA when credits match."/>
+            <Button fx:id="calculateGpaButton"
+                    text="Calculate GPA"
+                    disable="true"
+                    onAction="#handleCalculateGpa"
+                    styleClass="primary-button"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
