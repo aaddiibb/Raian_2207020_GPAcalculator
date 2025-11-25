@@ -17,7 +17,9 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class GpaFormController {
 
@@ -51,8 +53,7 @@ public class GpaFormController {
 
     @FXML
     public void initialize() {
-
-
+        // Set up table columns
         nameCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getName()));
         codeCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getCode()));
         creditsCol.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().getCredits()));
@@ -62,30 +63,27 @@ public class GpaFormController {
 
         courseTable.setItems(courses);
 
+        // Grade choices
         gradeBox.getItems().addAll(
                 "A+", "A", "A-",
                 "B+", "B", "B-",
                 "C+", "C", "D", "F"
         );
 
-
+        // Target credits field
         targetCreditsField.setText(String.valueOf(targetCredits));
-
-        targetCreditsField.textProperty().addListener((obs, oldVal, newVal) -> {
+        targetCreditsField.textProperty().addListener((obs, o, n) -> {
             try {
-                targetCredits = Double.parseDouble(newVal);
+                targetCredits = Double.parseDouble(n);
                 if (targetCredits <= 0) throw new NumberFormatException();
-
                 updateCreditsAndButton();
             } catch (NumberFormatException e) {
                 calculateGpaButton.setDisable(true);
             }
         });
 
-        updateCreditsAndButton();
-
+        // Update button disabled until a row is selected
         updateButton.setDisable(true);
-
         courseTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
                 fillForm(newSel);
@@ -94,7 +92,36 @@ public class GpaFormController {
                 updateButton.setDisable(true);
             }
         });
+
+        // Initial state – which data to show is decided from outside (startNewSession / loadHistoryFromDatabase)
+        updateCreditsAndButton();
+        statusLabel.setText("Choose 'Start GPA Calculator' or 'Show History' from Home.");
     }
+
+    // ---------- MODES CALLED FROM OTHER CONTROLLERS ----------
+
+    // Used by HelloController when user clicks "Show History"
+    public void loadHistoryFromDatabase() {
+        try {
+            courses.setAll(CourseDAO.getAllCourses());
+            currentCredits = courses.stream().mapToDouble(Course::getCredits).sum();
+            updateCreditsAndButton();
+            statusLabel.setText("History loaded from database.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load courses.");
+        }
+    }
+
+    // Used by HelloController when user clicks "Start GPA Calculator"
+    public void startNewSession() {
+        courses.clear();
+        currentCredits = 0.0;
+        updateCreditsAndButton();
+        statusLabel.setText("New GPA session. Add courses and calculate GPA.");
+    }
+
+    // ---------- CRUD HANDLERS (DB + TABLE) ----------
 
     @FXML
     private void handleAddCourse() {
@@ -108,15 +135,19 @@ public class GpaFormController {
         }
 
         Course c = new Course(d.name, d.code, d.credits, d.teacher1, d.teacher2, d.grade);
-        courses.add(c);
 
-        currentCredits += d.credits;
-        clearFields();
-        updateCreditsAndButton();
-
-        statusLabel.setText("Course added successfully.");
+        try {
+            c = CourseDAO.insertCourse(c); // save to DB, set id
+            courses.add(c);                // update table
+            currentCredits += c.getCredits();
+            clearFields();
+            updateCreditsAndButton();
+            statusLabel.setText("Course added (saved to DB).");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not insert course.");
+        }
     }
-
 
     @FXML
     private void handleRemoveCourse() {
@@ -126,13 +157,17 @@ public class GpaFormController {
             return;
         }
 
-        courses.remove(selected);
-        currentCredits -= selected.getCredits();
-
-        updateCreditsAndButton();
-        statusLabel.setText("Course removed.");
+        try {
+            CourseDAO.deleteCourse(selected); // delete from DB
+            courses.remove(selected);        // update table
+            currentCredits -= selected.getCredits();
+            updateCreditsAndButton();
+            statusLabel.setText("Course removed from DB.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not delete course.");
+        }
     }
-
 
     @FXML
     private void handleUpdateCourse() {
@@ -146,7 +181,6 @@ public class GpaFormController {
         if (d == null) return;
 
         double newTotal = currentCredits - sel.getCredits() + d.credits;
-
         if (newTotal > targetCredits) {
             showAlert(Alert.AlertType.WARNING, "Credit Limit",
                     "Updating this course exceeds the target credits.");
@@ -160,13 +194,17 @@ public class GpaFormController {
         sel.setTeacher2(d.teacher2);
         sel.setLetterGrade(d.grade);
 
-        currentCredits = newTotal;
-        courseTable.refresh();
-        updateCreditsAndButton();
-
-        statusLabel.setText("Course updated successfully.");
+        try {
+            CourseDAO.updateCourse(sel); // update DB
+            currentCredits = newTotal;
+            courseTable.refresh();
+            updateCreditsAndButton();
+            statusLabel.setText("Course updated in DB.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not update course.");
+        }
     }
-
 
     @FXML
     private void handleReset() {
@@ -174,14 +212,42 @@ public class GpaFormController {
         currentCredits = 0;
         clearFields();
         updateCreditsAndButton();
-        statusLabel.setText("Form reset.");
+        statusLabel.setText("Form reset (database rows not deleted).");
     }
 
+    // ---------- EXPORT TO CSV ----------
+
+    @FXML
+    private void handleExport() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Export Courses");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("CSV File", "*.csv")
+        );
+
+        File file = fileChooser.showSaveDialog(null);
+        if (file == null) return;
+
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write("Course Name,Course Code,Credits,Teacher 1,Teacher 2,Grade\n");
+            for (Course c : courses) {
+                writer.write(String.format("%s,%s,%.2f,%s,%s,%s%n",
+                        c.getName(), c.getCode(), c.getCredits(),
+                        c.getTeacher1(), c.getTeacher2(), c.getLetterGrade()));
+            }
+
+            showAlert(Alert.AlertType.INFORMATION, "Export Successful", "Data exported!");
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Export Failed", "Unable to export file.");
+        }
+    }
+
+    // ---------- GPA CALC + SAVE TO gpa_history + RESULT SCREEN ----------
 
     @FXML
     private void handleCalculateGpa(ActionEvent event) {
+        // 1) Compute GPA from current courses
         double qp = 0, cr = 0;
-
         for (Course c : courses) {
             qp += gradePoint(c.getLetterGrade()) * c.getCredits();
             cr += c.getCredits();
@@ -189,6 +255,30 @@ public class GpaFormController {
 
         double gpa = cr == 0 ? 0 : qp / cr;
 
+        // 2) Ask for Roll and save to gpa_history
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Save GPA Result");
+        dialog.setHeaderText("Enter student roll to save this GPA in history");
+        dialog.setContentText("Roll:");
+
+        Optional<String> rollResult = dialog.showAndWait();
+        if (rollResult.isPresent()) {
+            String roll = rollResult.get().trim();
+            if (!roll.isEmpty()) {
+                try {
+                    GpaHistoryEntry entry = new GpaHistoryEntry(roll, gpa);
+                    GpaHistoryDAO.insertEntry(entry);
+                    System.out.println("Saved GPA history for roll = " + roll + ", gpa = " + gpa);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR,
+                            "Database Error",
+                            "Could not save GPA result to history.");
+                }
+            }
+        }
+
+        // 3) Show result screen (same as before)
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("result-view.fxml"));
             Parent root = loader.load();
@@ -209,30 +299,7 @@ public class GpaFormController {
         }
     }
 
-
-    @FXML
-    private void handleExport() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Export Courses");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV File", "*.csv"));
-
-        File file = fileChooser.showSaveDialog(null);
-        if (file == null) return;
-
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write("Course Name,Course Code,Credits,Teacher 1,Teacher 2,Grade\n");
-            for (Course c : courses) {
-                writer.write(String.format("%s,%s,%.2f,%s,%s,%s\n",
-                        c.getName(), c.getCode(), c.getCredits(),
-                        c.getTeacher1(), c.getTeacher2(), c.getLetterGrade()));
-            }
-
-            showAlert(Alert.AlertType.INFORMATION, "Export Successful", "Data exported!");
-        } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Export Failed", "Unable to export file.");
-        }
-    }
-
+    // ---------- NAVIGATION ----------
 
     @FXML
     private void handleBackToHome(ActionEvent event) {
@@ -253,7 +320,7 @@ public class GpaFormController {
         }
     }
 
-
+    // ---------- Helper methods ----------
 
     private static class CourseData {
         String name, code, teacher1, teacher2, grade;
@@ -268,8 +335,8 @@ public class GpaFormController {
         String t2 = teacher2Field.getText().trim();
         String grade = gradeBox.getValue();
 
-        if (name.isEmpty() || code.isEmpty() || creditText.isEmpty() ||
-                t1.isEmpty() || t2.isEmpty() || grade == null) {
+        if (name.isEmpty() || code.isEmpty() || creditText.isEmpty()
+                || t1.isEmpty() || t2.isEmpty() || grade == null) {
             showAlert(Alert.AlertType.WARNING, "Validation", "Fill all fields.");
             return null;
         }
@@ -317,18 +384,18 @@ public class GpaFormController {
     }
 
     private double gradePoint(String g) {
-        return switch (g) {
-            case "A+" -> 4.00;
-            case "A"  -> 3.75;
-            case "A-" -> 3.50;
-            case "B+" -> 3.25;
-            case "B"  -> 3.00;
-            case "B-" -> 2.75;
-            case "C+" -> 2.50;
-            case "C"  -> 2.25;
-            case "D"  -> 2.00;
-            default   -> 0.00;
-        };
+        switch (g) {
+            case "A+": return 4.00;
+            case "A":  return 3.75;
+            case "A-": return 3.50;
+            case "B+": return 3.25;
+            case "B":  return 3.00;
+            case "B-": return 2.75;
+            case "C+": return 2.50;
+            case "C":  return 2.25;
+            case "D":  return 2.00;
+            default:   return 0.00;
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {

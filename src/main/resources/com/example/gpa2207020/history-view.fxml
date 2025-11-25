@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.gpa2207020.HistoryController"
+            prefWidth="700" prefHeight="500">
+
+    <top>
+        <VBox spacing="5" alignment="CENTER">
+            <padding>
+                <Insets top="15" bottom="10" left="15" right="15"/>
+            </padding>
+
+            <Label text="GPA History"
+                   styleClass="section-title"
+                   alignment="CENTER"/>
+
+            <Label fx:id="statusLabel"
+                   text="Loading history..."
+                   styleClass="subtitle-label"
+                   alignment="CENTER"/>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="historyTable">
+            <columns>
+                <TableColumn fx:id="rollCol" text="Roll" prefWidth="200"/>
+                <TableColumn fx:id="resultCol" text="Result (GPA)" prefWidth="150"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <padding>
+                <Insets top="10" bottom="10" left="10" right="10"/>
+            </padding>
+
+            <Button text="Delete Selected"
+                    onAction="#handleDeleteSelected"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Edit"
+                    onAction="#handleEditSelected"/>
+
+            <Button text="Back to Home"
+                    onAction="#handleBackToHome"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

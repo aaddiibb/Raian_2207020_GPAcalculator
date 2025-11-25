@@ -2,6 +2,7 @@ package com.example.gpa2207020;
 
 public class Course {
 
+    private int id;              // primary key in DB
     private String name;
     private String code;
     private double credits;
@@ -9,7 +10,11 @@ public class Course {
     private String teacher2;
     private String letterGrade;
 
-    public Course(String name, String code, double credits, String teacher1, String teacher2, String letterGrade) {
+    // used when loading from DB
+    public Course(int id, String name, String code,
+                  double credits, String teacher1,
+                  String teacher2, String letterGrade) {
+        this.id = id;
         this.name = name;
         this.code = code;
         this.credits = credits;
@@ -17,6 +22,16 @@ public class Course {
         this.teacher2 = teacher2;
         this.letterGrade = letterGrade;
     }
+
+    // used when creating new before insert
+    public Course(String name, String code,
+                  double credits, String teacher1,
+                  String teacher2, String letterGrade) {
+        this(-1, name, code, credits, teacher1, teacher2, letterGrade);
+    }
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     public String getName() { return name; }
     public String getCode() { return code; }

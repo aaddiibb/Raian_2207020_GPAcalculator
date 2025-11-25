@@ -11,9 +11,9 @@
         <VBox alignment="CENTER" spacing="5" styleClass="result-header">
             <padding><Insets bottom="20" top="25" /></padding>
             <Label styleClass="title-label" text="Student GPA Report" textFill="#e40f0f">
-            <font>
-               <Font name="Arial Black" size="51.0" />
-            </font></Label>
+                <font>
+                    <Font name="Arial Black" size="51.0" />
+                </font></Label>
         </VBox>
     </top>
 
